@@ -1,5 +1,2 @@
 # Code Linting
 .vscode
-
-# Cache
-model/__pycache

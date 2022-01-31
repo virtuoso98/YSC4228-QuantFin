@@ -1,5 +1,4 @@
 import numpy as np
-import random
 
 class DataStore:
     def __init__(self, x_raw, y_raw, num_folds = 10) -> None:
@@ -24,8 +23,5 @@ class DataStore:
         idx_arr = [i for i in range(len(self.x_raw))]
         np.random.shuffle(idx_arr)
         np_split_array = np.array_split(idx_arr, self.num_folds)
-        self.folds_idx = np_split_array
-        
-        
-        
+        self.folds_idx = [list(fold) for fold in np_split_array]
         
