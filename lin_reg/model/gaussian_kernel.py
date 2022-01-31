@@ -7,7 +7,6 @@ class GaussianKernel(DataStore):
     def __init__(self, x_raw, y_raw, num_folds) -> None:
         super().__init__(x_raw, y_raw, num_folds)
         self.mse = []
-        # Finding the optimal bandwidth
         self.bandwidths = [0.1 * (i + 1) for i in range(20)]
         self.optimal_h = []
 

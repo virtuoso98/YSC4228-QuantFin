@@ -33,6 +33,9 @@ def parse_files(x_file, y_file):
 
     return x_raw, y_raw    
 
+def plot_graph():
+    pass
+
 def execute() -> None:
     # Process Command Line Inputs
     args = process_inputs()

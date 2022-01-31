@@ -1,2 +1,5 @@
 # Code Linting
 .vscode
+
+# No need to upload pycache
+model/__pycache__
