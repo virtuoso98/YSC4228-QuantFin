@@ -7,8 +7,9 @@ class GaussianKernel(DataStore):
     def __init__(self, x_raw, y_raw, num_folds) -> None:
         super().__init__(x_raw, y_raw, num_folds)
         self.mse = []
-        self.bandwidths = [0.1 * (i + 1) for i in range(20)]
+        self.bandwidths = [(i + 1) * 0.1 for i in range(20)]
         self.optimal_h = []
+        self.final_y_preds = []
 
     def calc_kernel(self, i, j, h) -> float:
         x_delta = (self.x_raw[i] - self.x_raw[j]) ** 2
@@ -26,10 +27,12 @@ class GaussianKernel(DataStore):
     def get_y_preds(self, test_idx, train_idx, h):
         y_preds = []
         for i in range(len(test_idx)):
-            total_weight = self.find_total_weight(i, train_idx, h)
+            total_weight = self.find_total_weight(test_idx[i], train_idx, h)
             y_pred = 0
             for j in range(len(train_idx)):
-                y_pred += self.calc_kernel(i, j, h) / total_weight * self.y_raw[j]
+                y_pred += self.calc_kernel(test_idx[i],
+                    train_idx[j],
+                    h) * self.y_raw[j] / total_weight
             y_preds.append(y_pred)
         return y_preds
 
@@ -52,8 +55,17 @@ class GaussianKernel(DataStore):
             for h in self.bandwidths:
                 y_preds = self.get_y_preds(test_idx, train_idx, h)
                 mse = self.get_mse(y_preds, test_idx)
-                local_fold.append((y_preds, mse))
-            optimal_h = self.find_best_mse(local_fold)
-            optimal_fold.append(optimal_h)
-        return self.find_best_mse(optimal_fold)
-            
+                local_fold.append((h, mse))
+            local_optimal = self.find_best_mse(local_fold)
+            optimal_fold.append(local_optimal)
+
+        # After finding Optimal h, Train Whole Dataset
+        optimal_h = self.find_best_mse(optimal_fold)[0]
+        # Now we can train using the raw x and y data
+        for i in range(len(self.x_raw)):
+            # TODO: Make more efficient
+            x_train = [j for j in range(len(self.x_raw)) if j != i]
+            final_y_pred = self.get_y_preds([i], x_train, optimal_h)[0]
+            self.final_y_preds.append(final_y_pred)
+
+        return self.final_y_preds
