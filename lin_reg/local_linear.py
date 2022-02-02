@@ -22,9 +22,6 @@ def process_inputs() -> dict:
         help = "Optional Param to display Scatterplot or not")
     parser.add_argument("--xout", required = False, help = "Path to Output")
 
-    # TODO: ADD ARGUMENT FOR PLOT
-    # Adding Relevant Arguments to parser
-
     return vars(parser.parse_args())
 
 def parse_files(x_file, y_file):
@@ -42,10 +39,9 @@ def parse_files(x_file, y_file):
 
 def plot_graph(x_raw, y_raw, pred_y, is_plot):
     if is_plot:
-        plt.scatter(x_raw, y_raw, color = 'skyblue', s=30, alpha = 0.5, marker = 'x', label = "data")
-        plt.scatter(x_raw, pred_y, color = 'red', s=30, alpha = 0.3, marker = '.',label="prediction")
-        plt.legend()
-        plt.show()
+        plt.scatter(x_raw, y_raw, color = 'skyblue', s = 30, alpha = 0.5, marker = 'x', label = "data")
+        plt.scatter(x_raw, pred_y, color = 'red', s = 30, alpha = 0.3, marker = '.', label="prediction")
+        plt.legend(); plt.show()
 
 
 def post_process(dir_name, pred_y_filename, pred_y):

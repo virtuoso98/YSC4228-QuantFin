@@ -16,6 +16,8 @@ class GaussianKernel(DataStore):
         return math.exp(- x_delta / h)
 
     def find_best_mse(self, y_pred_and_mse):
+        """ Finds minimum mean squared error
+        """
         return min(y_pred_and_mse, key = lambda tup: tup[1])
 
     def find_total_weight(self, x_test, train_idx, h) -> float:
@@ -32,7 +34,7 @@ class GaussianKernel(DataStore):
             for j in range(len(train_idx)):
                 y_pred += self.calc_kernel(test_idx[i],
                     train_idx[j],
-                    h) * self.y_raw[j] / total_weight
+                    h) * self.y_raw[train_idx[j]] / total_weight
             y_preds.append(y_pred)
         return y_preds
 
