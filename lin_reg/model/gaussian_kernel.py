@@ -4,11 +4,11 @@ import math
 
 class GaussianKernel(DataStore):
 
-    def __init__(self, x_raw, y_raw, num_folds) -> None:
+    def __init__(self, x_raw = [], y_raw = [], num_folds = 10) -> None:
         super().__init__(x_raw, y_raw, num_folds)
         self.mse = []
         self.bandwidths = [(i + 1) * 0.1 for i in range(20)]
-        self.optimal_h = []
+        self.optimal_h = None
         self.final_y_preds = []
 
     def calc_kernel(self, i, j, h) -> float:
@@ -16,7 +16,8 @@ class GaussianKernel(DataStore):
         return math.exp(- x_delta / h)
 
     def find_best_mse(self, y_pred_and_mse):
-        """ Finds minimum mean squared error
+        """Finds minimum mean squared error
+
         """
         return min(y_pred_and_mse, key = lambda tup: tup[1])
 
@@ -62,12 +63,13 @@ class GaussianKernel(DataStore):
             optimal_fold.append(local_optimal)
 
         # After finding Optimal h, Train Whole Dataset
-        optimal_h = self.find_best_mse(optimal_fold)[0]
-        # Now we can train using the raw x and y data
+        self.optimal_h = self.find_best_mse(optimal_fold)[0]
+
+    def predict(self):
         for i in range(len(self.x_raw)):
             # TODO: Make more efficient
             x_train = [j for j in range(len(self.x_raw)) if j != i]
-            final_y_pred = self.get_y_preds([i], x_train, optimal_h)[0]
+            final_y_pred = self.get_y_preds([i], x_train, self.optimal_h)[0]
             self.final_y_preds.append(final_y_pred)
 
         return self.final_y_preds
