@@ -96,3 +96,7 @@ class GaussianKernel(DataStore):
                 y_pred = self._get_y_pred(self.optimal_h)
                 output.append(y_pred[0])
             return output
+
+    def train_and_predict(self, x_to_predict):
+        self.train()
+        return self.predict(x_to_predict)

@@ -98,8 +98,7 @@ def execute() -> None:
 
     # Instantiate Kernel, train it and predict if applicable
     kernel = GaussianKernel(x_raw, y_raw, args["num_folds"])
-    kernel.train()
-    final_y_pred = kernel.predict(x_to_predict)
+    final_y_pred = kernel.train_and_predict(x_to_predict)
     # Produce Output Directory and Graph
     post_process(args["output"], final_y_pred)
     # Plot the graph, if boolean parameter is given
