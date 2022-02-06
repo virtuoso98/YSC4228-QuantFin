@@ -1,4 +1,3 @@
-from abc import abstractclassmethod
 import numpy as np
 
 class DataStore:
@@ -21,11 +20,15 @@ class DataStore:
 
     def split(self, seed = 100) -> None:
         np.random.seed(seed)
-        idx_arr = [i for i in range(len(self.x_raw))]
+        idx_arr = list(range(len(self.x_raw)))
         np.random.shuffle(idx_arr)
         np_split_array = np.array_split(idx_arr, self.num_folds)
         self.folds_idx = [list(fold) for fold in np_split_array]
 
-    @abstractclassmethod
-    def train(self):
+    @classmethod
+    def train(cls):
+        pass
+
+    @classmethod
+    def predict(cls):
         pass

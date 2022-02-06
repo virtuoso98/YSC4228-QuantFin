@@ -1,5 +1,4 @@
-import argparse
-import os
+import argparse, os
 import matplotlib.pyplot as plt
 from model.gaussian_kernel import GaussianKernel
 
@@ -10,7 +9,8 @@ def process_inputs() -> dict:
         prog = "local_linear",
         description= "Parse x, y inputs, k-folds and graph flag."
     )
-    # Adding Command Line Arguments
+
+    # Adding Relevant Command Line Arguments
     parser.add_argument("--x", required = True, help = "Get x-coords filename")
     parser.add_argument("--y", required = True, help = "Get y-coords filename")
     parser.add_argument("--output",
@@ -29,28 +29,53 @@ def process_inputs() -> dict:
 
     return vars(parser.parse_args())
 
-def parse_files(x_file, y_file):
-    """Parse x and y inputs"""
-    x_filepath = f'./data/{x_file}.dms'
-    y_filepath = f'./data/{y_file}.dms'
+def parse_file(filename: str):
+    """Parses dms file at target filepath
+    
+    If dms file manages to be parsed, returns a 1D float array of data. 
+    If filename is None, returns None because this helps the kernel target
+    where to predict
+
+    Args:
+        filename (str): Path of the file
+
+    Returns:
+        
+    """
+    
+    # Caters for the case when no xout argument is fed
+    if filename is None:
+        return None
+    # xin and yin are always in data, but for xout,
+    # source directory could differ
+    if filename in ("xin", "yin"):
+        fullpath = f'./data/{filename}.dms'
+    else:
+        fullpath = f'{filename}.dms'
 
     # we know these 2 pathfiles will exist, but not the predicted x
-    with open(x_filepath) as fx:
-        x_str = fx.readlines()
-        x_raw = list(map(lambda x: float(x.strip()), x_str))
-    with open(y_filepath) as fy:
-        y_str = fy.readlines()
-        y_raw = list(map(lambda y: float(y.strip()), y_str))
-    
-    # Check whether file to predict exists
+    try:
+        with open(fullpath, encoding = "utf-8-sig") as f:
+            file_str = f.readlines()
+            parsed_data = list(map(lambda x: float(x.strip()), file_str))
+        return parsed_data
 
-    return x_raw, y_raw
+    except (OSError, IOError) as e:
+        raise e
 
-def plot_graph(x_raw, y_raw, pred_y, is_plot):
-    if is_plot:
-        plt.scatter(x_raw, y_raw, color = 'skyblue', s = 30, alpha = 0.5, marker = 'x', label = "data")
-        plt.scatter(x_raw, pred_y, color = 'red', s = 30, alpha = 0.3, marker = '.', label="prediction")
-        plt.legend(); plt.show()
+def plot_graph(x_raw, y_raw, x_pred, y_pred):
+    # Plot Scatter Plot of Predicted Graph
+    plt.scatter(x = x_raw, y = y_raw,
+        color = 'skyblue', s = 30, alpha = 0.5,
+        marker = 'x', label = "data")
+    # Plot Scatter Plot of Predict Graph
+    plt.scatter(x = x_pred, y = y_pred,
+        color = 'red', s = 30, alpha = 0.3,
+        marker = '.', label="prediction")
+    plt.legend()
+    plt.show()
+
+    # TODO: Place this in output directory too
 
 
 def post_process(filename, pred_y):
@@ -58,7 +83,7 @@ def post_process(filename, pred_y):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     output_filepath = f'./output/{filename}.dms'
-    with open(output_filepath, "w") as fn:
+    with open(output_filepath, "w", encoding = "utf-8") as fn:
         for line in pred_y:
             fn.write(f'{line}\n')
 
@@ -66,14 +91,20 @@ def execute() -> None:
     """Consolidated function that runs the linear regression model."""
     # Process Command Line Inputs
     args = process_inputs()
-    # Get Raw X, Y data
-    x_raw, y_raw = parse_files(args["x"], args["y"])
+    # Get Raw X, Y data and predict
+    x_raw = parse_file(args["x"])
+    y_raw = parse_file(args["y"])
+    x_to_predict = parse_file(args["xout"])
+
+    # Instantiate Kernel, train it and predict if applicable
     kernel = GaussianKernel(x_raw, y_raw, args["num_folds"])
-    pred_y = kernel.train()
-    # TODO: PREDICTION
+    kernel.train()
+    _ = kernel.predict(x_to_predict)
     # Produce Output Directory and Graph
     # post_process(args["output"], pred_y)
-    # plot_graph(x_raw, y_raw, pred_y, args["plot"])
+    # is_plot = args["plot"]
+    # if is_plot:
+    #     plot_graph(x_raw, y_raw, pred_y, args["plot"])
 
 if __name__ == '__main__':
     execute()

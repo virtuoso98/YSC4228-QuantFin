@@ -1,10 +1,10 @@
-from model.data_store import DataStore
+from data_store import DataStore
 from functools import reduce
 import math
 
 class GaussianKernel(DataStore):
 
-    def __init__(self, x_raw = [], y_raw = [], num_folds = 10) -> None:
+    def __init__(self, x_raw = None, y_raw = None, num_folds = 10) -> None:
         super().__init__(x_raw, y_raw, num_folds)
         self.mse = []
         self.bandwidths = [(i + 1) * 0.1 for i in range(20)]
@@ -65,11 +65,13 @@ class GaussianKernel(DataStore):
         # After finding Optimal h, Train Whole Dataset
         self.optimal_h = self.find_best_mse(optimal_fold)[0]
 
-    def predict(self):
+    def predict(self, x_to_predict):
         for i in range(len(self.x_raw)):
-            # TODO: Make more efficient
             x_train = [j for j in range(len(self.x_raw)) if j != i]
             final_y_pred = self.get_y_preds([i], x_train, self.optimal_h)[0]
             self.final_y_preds.append(final_y_pred)
 
         return self.final_y_preds
+
+    def _set_x_raw(self, new_x_raw):
+        self.x_raw = new_x_raw
