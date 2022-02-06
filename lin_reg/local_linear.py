@@ -106,7 +106,7 @@ def execute() -> None:
     plot_graph(x_raw, 
         y_raw,
         x_raw if not x_to_predict else x_to_predict,
-        final_y_pred, 
+        final_y_pred,
         is_plot)
 
 if __name__ == '__main__':

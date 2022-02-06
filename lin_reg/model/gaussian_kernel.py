@@ -36,7 +36,8 @@ class GaussianKernel(DataStore):
             total_weight = self._find_total_weight(x_ev, h)
             y_pred = 0
             for i, x_tr in enumerate(self.x_train):
-                y_pred += self._calc_kernel(x_ev, x_tr, h) * self.y_train[i] / total_weight
+                y_pred += self._calc_kernel(x_ev,
+                    x_tr, h) * self.y_train[i] / total_weight
             y_preds.append(y_pred)
         return y_preds
 
@@ -86,17 +87,19 @@ class GaussianKernel(DataStore):
             self.x_eval = x_to_predict
             return self._get_y_pred(self.optimal_h)
         else:
-            n_points = len(self.x_raw)
+            n_pts = len(self.x_raw)
             output = []
-            for i in range(n_points):
+            for i in range(n_pts):
                 self.x_eval = [self.x_raw[i]]
-                self.x_train = [self.x_raw[j] for j in range(n_points) if j != i]
-                self.y_train = [self.y_raw[j] for j in range(n_points) if j != i]
+                self.x_train = [self.x_raw[j] for j in range(n_pts) if j != i]
+                self.y_train = [self.y_raw[j] for j in range(n_pts) if j != i]
                 # y_pred is now just a singleton list 
                 y_pred = self._get_y_pred(self.optimal_h)
                 output.append(y_pred[0])
             return output
 
     def train_and_predict(self, x_to_predict):
+        """Consolidated function that runs the kernel
+        """
         self.train()
         return self.predict(x_to_predict)
