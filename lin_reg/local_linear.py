@@ -9,7 +9,6 @@ def process_inputs() -> dict:
         prog = "local_linear",
         description= "Parse x, y inputs, k-folds and graph flag."
     )
-
     # Adding Relevant Command Line Arguments
     parser.add_argument("--x", required = True, help = "Get x-coords filename")
     parser.add_argument("--y", required = True, help = "Get y-coords filename")
@@ -31,8 +30,8 @@ def process_inputs() -> dict:
 
 def parse_file(filename: str):
     """Parses dms file at target filepath
-    
-    If dms file manages to be parsed, returns a 1D float array of data. 
+
+    If dms file manages to be parsed, returns a 1D float array of data.
     If filename is None, returns None because this helps the kernel target
     where to predict
 
@@ -40,9 +39,9 @@ def parse_file(filename: str):
         filename (str): Path of the file
 
     Returns:
-        
+
     """
-    
+
     # Caters for the case when no xout argument is fed
     if filename is None:
         return None
@@ -63,17 +62,18 @@ def parse_file(filename: str):
     except (OSError, IOError) as e:
         raise e
 
-def plot_graph(x_raw, y_raw, x_pred, y_pred):
+def plot_graph(x_raw, y_raw, x_pred, y_pred, is_plot):
     # Plot Scatter Plot of Predicted Graph
-    plt.scatter(x = x_raw, y = y_raw,
-        color = 'skyblue', s = 30, alpha = 0.5,
-        marker = 'x', label = "data")
-    # Plot Scatter Plot of Predict Graph
-    plt.scatter(x = x_pred, y = y_pred,
-        color = 'red', s = 30, alpha = 0.3,
-        marker = '.', label="prediction")
-    plt.legend()
-    plt.show()
+    if is_plot:
+        plt.scatter(x = x_raw, y = y_raw,
+            color = 'skyblue', s = 30, alpha = 0.5,
+            marker = 'x', label = "data")
+        # Plot Scatter Plot of Predict Graph
+        plt.scatter(x = x_pred, y = y_pred,
+            color = 'red', s = 30, alpha = 0.3,
+            marker = '.', label="prediction")
+        plt.legend()
+        plt.show()
 
     # TODO: Place this in output directory too
 
@@ -99,12 +99,16 @@ def execute() -> None:
     # Instantiate Kernel, train it and predict if applicable
     kernel = GaussianKernel(x_raw, y_raw, args["num_folds"])
     kernel.train()
-    _ = kernel.predict(x_to_predict)
+    final_y_pred = kernel.predict(x_to_predict)
     # Produce Output Directory and Graph
-    # post_process(args["output"], pred_y)
-    # is_plot = args["plot"]
-    # if is_plot:
-    #     plot_graph(x_raw, y_raw, pred_y, args["plot"])
+    post_process(args["output"], final_y_pred)
+    # Plot the graph, if boolean parameter is given
+    is_plot = args["plot"]
+    plot_graph(x_raw, 
+        y_raw,
+        x_raw if not x_to_predict else x_to_predict,
+        final_y_pred, 
+        is_plot)
 
 if __name__ == '__main__':
     execute()
