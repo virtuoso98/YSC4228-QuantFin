@@ -1,9 +1,16 @@
-import argparse, os
+import argparse
+import os
+from typing import Optional
 import matplotlib.pyplot as plt
 from model.gaussian_kernel import GaussianKernel
 
 def process_inputs() -> dict:
-    """Processes inputs from command line for further processing."""
+    """Processes inputs from command line for further processing.
+
+    Returns:
+        Dictionary that maps parser command line arguments (key) to
+        the parameters (values) inputted by the user.
+    """
 
     parser = argparse.ArgumentParser(
         prog = "local_linear",
@@ -24,22 +31,28 @@ def process_inputs() -> dict:
         type = bool,
         default = False,
         help = "Optional Param to display Scatterplot or not")
-    parser.add_argument("--xout", required = False, help = "File to Get predictions on")
+    parser.add_argument("--xout",
+        required = False,
+        help = "File that contains data to evaluate x values")
 
     return vars(parser.parse_args())
 
-def parse_file(filename: str):
+def parse_file(filename: str) -> Optional[list[float]]:
     """Parses dms file at target filepath
 
     If dms file manages to be parsed, returns a 1D float array of data.
-    If filename is None, returns None because this helps the kernel target
-    where to predict
+    If filename is None, returns None. This is helpful in helping the
+    kernel identify whether to predict xin or xout.
 
     Args:
         filename (str): Path of the file
 
     Returns:
+        List[float] / None: None if filename is None, else float array of data
 
+    Raises:
+        OSError: If target file is not found
+        ValueError: If file contains non-numeric characters
     """
 
     # Caters for the case when no xout argument is fed
@@ -59,10 +72,27 @@ def parse_file(filename: str):
             parsed_data = list(map(lambda x: float(x.strip()), file_str))
         return parsed_data
 
-    except (OSError, IOError) as e:
+    except (OSError, ValueError) as e:
         raise e
 
-def plot_graph(x_raw, y_raw, x_pred, y_pred, is_plot):
+def plot_graph(x_raw: list[float],
+    y_raw: list[float],
+    x_pred: list[float],
+    y_pred: list[float],
+    is_plot: bool):
+    """Creates the scatterplot of y against x using matplotlib.pyplot.
+
+    Args:
+        x_raw: list of x input data used to determine optimal h
+        y_raw: list of y input data used to determine optimal h
+        x_pred: list of x data predicted using linear kernel regression
+        y_pred: list of y data predicted using linear kernel regression
+        is_plot: Whether 
+
+    Returns:
+        A graph of the corresponding scatter plot, stored in
+        ./output directory
+    """
     # Plot Scatter Plot of Predicted Graph
     if is_plot:
         plt.scatter(x = x_raw, y = y_raw,
@@ -79,6 +109,13 @@ def plot_graph(x_raw, y_raw, x_pred, y_pred, is_plot):
 
 
 def post_process(filename, pred_y):
+    """Produces the
+
+    Args:
+
+    Returns:
+
+    """
     output_dir = './output'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -88,7 +125,7 @@ def post_process(filename, pred_y):
             fn.write(f'{line}\n')
 
 def execute() -> None:
-    """Consolidated function that runs the linear regression model."""
+    """Consolidated function that runs kernel linear regression"""
     # Process Command Line Inputs
     args = process_inputs()
     # Get Raw X, Y data and predict
@@ -103,7 +140,7 @@ def execute() -> None:
     post_process(args["output"], final_y_pred)
     # Plot the graph, if boolean parameter is given
     is_plot = args["plot"]
-    plot_graph(x_raw, 
+    plot_graph(x_raw,
         y_raw,
         x_raw if not x_to_predict else x_to_predict,
         final_y_pred,

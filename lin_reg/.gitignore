@@ -1,5 +1,10 @@
 # Code Linting
 .vscode
 
-# No need to upload pycache
+# Cached Files
 model/__pycache__
+model/__pycache__/*
+
+# Pytest Cache
+model/.pytest_cache
+model/.pytest_cache/*

@@ -6,6 +6,7 @@ def test_split():
     for _ in range(100):
         n_data = randint(2, 1000)
         n_folds = randint(2, n_data)
+        # type of data should not affect
         test_x = [random() for _ in range(n_data)]
         test_y = [random() for _ in range(n_data)]
         raw_data = DataStore(test_x, test_y, n_folds)
@@ -22,7 +23,7 @@ def test_data_store_exception_unequal_length():
     n_folds = randint(2, min(rand_index))
     test_x = [random() for _ in range(rand_index[0])]
     test_y = [random() for _ in range(rand_index[1])]
-    
+
     with pytest.raises(ValueError) as excinfo:
         _ = DataStore(test_x, test_y, n_folds)
         assert "Unequal X and Y Data Points" in excinfo.value

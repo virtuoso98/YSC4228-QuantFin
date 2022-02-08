@@ -20,6 +20,13 @@ class GaussianKernel(DataStore):
 
 
     def _calc_kernel(self, x1, x2, h) -> float:
+        """Calculates the Gaussian Kernel, given arguments
+
+        Args:
+
+        Returns:
+            (float) 
+        """
         x_delta = (x1 - x2) ** 2
         return math.exp(- x_delta / h)
 
@@ -64,7 +71,7 @@ class GaussianKernel(DataStore):
             test_idx = self.folds_idx[i]
             train_idx_unflattened = [self.folds_idx[j] for j in range(n_folds) if i != j]
             train_idx = reduce(lambda a, b: a + b, train_idx_unflattened)
-            # Allocate to appropriate classes
+            # Allocate actual train-test split
             self.x_eval = [self.x_raw[k] for k in test_idx]
             self.y_eval = [self.y_raw[k] for k in test_idx]
             self.x_train = [self.x_raw[k] for k in train_idx]
@@ -81,6 +88,7 @@ class GaussianKernel(DataStore):
         self.optimal_h = self._find_best_mse(optimal_h_for_fold)[0]
 
     def predict(self, x_to_predict):
+        # if there is xout, predict xout using xin, yin
         if x_to_predict is not None:
             self.x_train = self.x_raw
             self.y_train = self.y_raw
@@ -100,6 +108,12 @@ class GaussianKernel(DataStore):
 
     def train_and_predict(self, x_to_predict):
         """Consolidated function that runs the kernel
+
+        Args:
+            x_to_predict
+
+        Returns:
+            
         """
         self.train()
         return self.predict(x_to_predict)
