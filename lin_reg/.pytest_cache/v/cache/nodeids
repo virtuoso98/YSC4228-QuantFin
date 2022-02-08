@@ -1,0 +1,4 @@
+[
+  "model/test_gaussian_kernel.py::test_calc_kernel",
+  "model/test_gaussian_kernel.py::test_find_total_weight"
+]
