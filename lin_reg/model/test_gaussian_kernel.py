@@ -51,19 +51,8 @@ def test_find_total_weight():
     # Testing that they are equivalent, modulo floating pt error
     assert abs(expected_weight - actual_weight) < 10 ** -6
 
-def test_get_y_pred():
-    # Populate test x to evaluate
-    test_x_ev = uniform(-10, 10)
-    test_h = uniform(0.1, 3)
-    # Populate test data
-    n_data = randint(2, 1000)
-    n_folds = randint(2, n_data)
-    test_x_train = [uniform(-10, 10) for _ in range(n_data)]
-    # Y dummy as it's not important to the test
-    dummy_y = [0 for _ in range(n_data)]
-    raw_data = GaussianKernel(test_x_train, dummy_y, n_folds)
-    # Can only test find_total_weight by populating x_train directly
-    raw_data.x_train = test_x_train
+def test_find_best_mse():
+
 
     
 
