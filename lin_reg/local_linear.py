@@ -33,7 +33,7 @@ def process_inputs() -> dict:
         help = "Optional Param to display Scatterplot or not")
     parser.add_argument("--xout",
         required = False,
-        help = "File that contains data to evaluate x values")
+        help = "Optional file param that contains x values for evaluation")
 
     return vars(parser.parse_args())
 
@@ -87,7 +87,7 @@ def plot_graph(x_raw: list[float],
         y_raw: list of y input data used to determine optimal h
         x_pred: list of x data predicted using linear kernel regression
         y_pred: list of y data predicted using linear kernel regression
-        is_plot: Whether 
+        is_plot: Flag of Whether graph should be plotted or not
 
     Returns:
         A graph of the corresponding scatter plot, stored in
@@ -103,20 +103,22 @@ def plot_graph(x_raw: list[float],
             color = 'red', s = 30, alpha = 0.3,
             marker = '.', label="prediction")
         plt.legend()
+        plt.savefig('./output/graph.png')
         plt.show()
 
-    # TODO: Place this in output directory too
-
-
-def post_process(filename, pred_y):
-    """Produces the
+def post_process(filename: str, pred_y: list[float]):
+    """Produces the output file of predicted y.
 
     Args:
+        filename:  name of output file. placed in ./output directory
+        pred_y: float array of predicted y values based on optimal h
 
     Returns:
-
+        A text file output/{filename}.dms that contains the predicted
+        y values, separated by newlines.
     """
     output_dir = './output'
+    # make directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     output_filepath = f'./output/{filename}.dms'
@@ -124,8 +126,8 @@ def post_process(filename, pred_y):
         for line in pred_y:
             fn.write(f'{line}\n')
 
-def execute() -> None:
-    """Consolidated function that runs kernel linear regression"""
+def execute():
+    """Overall function that runs kernel linear regression"""
     # Process Command Line Inputs
     args = process_inputs()
     # Get Raw X, Y data and predict
