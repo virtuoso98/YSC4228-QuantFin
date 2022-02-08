@@ -1,0 +1,6 @@
+[
+  "test_data_store.py::test_split",
+  "test_data_store.py::test_data_store_exception_unequal_length",
+  "test_data_store.py::test_data_store_exception_excessive_folds",
+  "test_data_store.py::test_data_store_exception_insufficient_folds"
+]
