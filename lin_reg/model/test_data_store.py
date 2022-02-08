@@ -6,6 +6,7 @@ def test_split():
     for _ in range(100):
         n_data = randint(2, 1000)
         n_folds = randint(2, n_data)
+        # type of data should not affect 
         test_x = [random() for _ in range(n_data)]
         test_y = [random() for _ in range(n_data)]
         raw_data = DataStore(test_x, test_y, n_folds)
