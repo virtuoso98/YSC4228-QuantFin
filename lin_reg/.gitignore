@@ -1,2 +1,10 @@
 # Code Linting
 .vscode
+
+# Cached Files
+__pycache__
+__pycache__/*
+
+# Pytest Cache
+.pytest_cache
+.pytest_cache/*

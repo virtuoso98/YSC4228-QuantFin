@@ -1,12 +1,13 @@
-from model.data_store import DataStore
-import pytest
 from random import random, randint, sample
+import pytest
+from model.data_store import DataStore
 
 def test_split():
+    """Tests for the validity of split() in DataStore"""
     for _ in range(100):
         n_data = randint(2, 1000)
         n_folds = randint(2, n_data)
-        # type of data should not affect
+        # type of data should not affect this type
         test_x = [random() for _ in range(n_data)]
         test_y = [random() for _ in range(n_data)]
         raw_data = DataStore(test_x, test_y, n_folds)
@@ -18,6 +19,7 @@ def test_split():
             assert len(fold) - len(test_x) // n_folds <= 1
 
 def test_data_store_exception_unequal_length():
+    """Tests that Unequal Length exception appropriately triggers"""
     # Test: x_raw, y_raw unequal length
     for _ in range(100):
         rand_index = sample(range(2, 1000), 2)
@@ -30,7 +32,8 @@ def test_data_store_exception_unequal_length():
             assert "Unequal X and Y Data Points" in excinfo.value
 
 def test_data_store_exception_excessive_folds():
-    #Test: number of folds exceed number of data points
+    """Tests that excessive fold exception appropriately triggers"""
+    # Test: number of folds exceed number of data points
     for _ in range(100):
         n_data = randint(2, 1000)
         n_folds = randint(n_data + 1, n_data + 1000)
@@ -38,11 +41,12 @@ def test_data_store_exception_excessive_folds():
         test_y = [random() for _ in range(n_data)]
 
         with pytest.raises(ValueError) as excinfo:
-            raw_data = DataStore(test_x, test_y, n_folds)
+            _ = DataStore(test_x, test_y, n_folds)
             assert "Number of Folds exceed Number of Data Points" in excinfo.value
 
 def test_data_store_exception_insufficient_folds():
-    #Test: need at least 2 folds for validation
+    """Tests that Insufficient fold exception appropriately triggers"""
+    # Test: need at least 2 folds for validation
     for _ in range(100):
         n_data = randint(2, 1000)
         n_folds = randint(0, 1)
@@ -50,5 +54,5 @@ def test_data_store_exception_insufficient_folds():
         test_y = [random() for _ in range(n_data)]
 
         with pytest.raises(ValueError) as excinfo:
-            raw_data = DataStore(test_x, test_y, n_folds)
+            _ = DataStore(test_x, test_y, n_folds)
             assert "Need at least 2 folds for validation." in excinfo.value

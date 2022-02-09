@@ -128,7 +128,6 @@ def post_process(filename: str, pred_y: list[float]):
 
 def execute():
     """Overall function that runs kernel linear regression"""
-    # Process Command Line Inputs
     args = process_inputs()
     # Get Raw X, Y data and predict
     x_raw = parse_file(args["x"])
@@ -149,4 +148,5 @@ def execute():
         is_plot)
 
 if __name__ == '__main__':
+    # Process Command Line Inputs
     execute()
