@@ -1,6 +1,6 @@
-# Assignment 1
+# Assignment 1 - Kernel Linear Regression
 
-This repository houses our code for the first assignment of Data Science in Quantitative Finance. In order to run the code, run the following command:
+This repository code that is done by Walter and Zhao Yuan for the first assignment of Data Science in Quantitative Finance. In order to run the code, run the following command:
 
 ```
 python local_linear.py --x xin –-y yin –-output output –-num_folds 10
@@ -11,5 +11,7 @@ Additionally, 2 optional parameters, `--plot` and `--xout` are supported. the `-
 ```
 python local_linear.py --x xin –-y yin –-output output –-num_folds 10 --plot True --xout ./data/xout
 ```
+
+Note that these commands assume that you are running .dms files, so you do not have to type the `.dms` type to indicate the type of file that is being read.
 
 Lastly, if you'd like to run all the unit tests, you may run `py.test` at the root directory of this repository. A `requirements.txt` file is also provided in case you need to install the relevant dependencies
