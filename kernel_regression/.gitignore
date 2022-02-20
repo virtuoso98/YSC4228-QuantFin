@@ -8,3 +8,7 @@ __pycache__/*
 # Pytest Cache
 .pytest_cache
 .pytest_cache/*
+
+# venv stuff
+.venv
+.venv/*
