@@ -37,7 +37,7 @@ def process_inputs() -> dict:
 
     return vars(parser.parse_args())
 
-def parse_file(filename: str) -> Optional[list[float]]:
+def parse_file(filename: str) -> Optional["list[float]"]:
     """Parses dms file at target filepath
 
     If dms file manages to be parsed, returns a 1D float array of data.
@@ -75,10 +75,10 @@ def parse_file(filename: str) -> Optional[list[float]]:
     except (OSError, ValueError) as e:
         raise e
 
-def plot_graph(x_raw: list[float],
-    y_raw: list[float],
-    x_pred: list[float],
-    y_pred: list[float],
+def plot_graph(x_raw: "list[float]",
+    y_raw: "list[float]",
+    x_pred: "list[float]",
+    y_pred: "list[float]",
     is_plot: bool):
     """Creates the scatterplot of y against x using matplotlib.pyplot.
 
@@ -106,7 +106,7 @@ def plot_graph(x_raw: list[float],
         plt.savefig('./output/graph.png')
         plt.show()
 
-def post_process(filename: str, pred_y: list[float]):
+def post_process(filename: str, pred_y: "list[float]"):
     """Produces the output file of predicted y.
 
     Args:

@@ -14,8 +14,8 @@ class DataStore:
     """
 
     def __init__(self,
-        x_raw: list[float],
-        y_raw: list[float],
+        x_raw: "list[float]",
+        y_raw: "list[float]",
         num_folds: int = 10) -> None:
         # Check if number of x and y data points tally
         if len(x_raw) != len(y_raw):

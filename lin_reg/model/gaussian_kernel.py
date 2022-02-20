@@ -69,7 +69,7 @@ class GaussianKernel(DataStore):
         return total_weight
 
 
-    def _get_y_pred(self, h: float) -> list[float]:
+    def _get_y_pred(self, h: float) -> "list[float]":
         """Gets predicted y iteratively, using kernel formula
 
         Args:
@@ -90,7 +90,7 @@ class GaussianKernel(DataStore):
             y_preds.append(y_pred)
         return y_preds
 
-    def _get_mse(self, y_preds: list[float])-> float:
+    def _get_mse(self, y_preds: "list[float]")-> float:
         """Method used to find MSE between predicted y and actual y
 
         Args:
