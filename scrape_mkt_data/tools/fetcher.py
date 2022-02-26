@@ -25,8 +25,8 @@ class Fetcher:
             if args["e"] is not None else datetime.now()
 
         # Compensate for yfinance bug, more specifically:
-        # Tracks from 1 day before start until 1 day before end
-        start_date += timedelta(days = 1)
+        # API Given Tracks until 1 day before end
+
         end_date += timedelta(days = 1)
 
         if start_date > datetime.now():
@@ -46,12 +46,12 @@ class Fetcher:
     def fetch_data(self) -> pd.DataFrame:
         tracker = yf.Ticker(self._ticker)
         try:
-            data = tracker.history(
+            data: pd.DataFrame = tracker.history(
                 start = self._start_date,
                 end = self._end_date
-            )
+            )[self._start_date : self._end_date]
             return data
-        # Error can be caused because raw date is converted to seconds:
+        # Error can be caused because raw date is converted to seconds (Line 150):
         # https://github.com/ranaroussi/yfinance/blob/main/yfinance/base.py
         # Best solution is to try a date that's more recent, within 50 years
         except OverflowError as err:
