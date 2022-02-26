@@ -37,7 +37,7 @@ def process_inputs():
 def execute():
     args = process_inputs()
     processor = Processor(args)
-    processor.get_data()
+    processor.compute_statistics()
 
 if __name__ == '__main__':
     execute()
