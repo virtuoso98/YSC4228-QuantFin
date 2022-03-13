@@ -51,7 +51,7 @@ class Fetcher:
                 end = self._end_date
             )[self._start_date : self._end_date]
             return data
-        # Error can be caused because raw date is converted to seconds (Line 150):
+        # Error can be caused as raw date is converted to seconds (Line 150):
         # https://github.com/ranaroussi/yfinance/blob/main/yfinance/base.py
         # Best solution is to try a date that's more recent, within 50 years
         except OverflowError as err:
