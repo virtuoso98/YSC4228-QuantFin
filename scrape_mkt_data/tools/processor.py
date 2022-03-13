@@ -100,7 +100,8 @@ class Processor(Fetcher):
     def print_statistics(self, statistics: dict):
         """Function that handles the printing of statistics.
 
-        This function was made as a standalone so that
+        This function was made as a standalone so that we
+        follow modular design conventions.
 
         Args:
             statistics: a dictionary of information type mapped
@@ -157,8 +158,8 @@ class Processor(Fetcher):
         """Adds column for stock adjusted for dividends to DataFrame
 
         This post-processing is done so that future calculations of the stock
-        become more managable. We have assumed that all dividends are indeed
-        re-invested into the same stock.
+        become more managable. We have assumed that all dividends are not
+        reinvested in any way.
 
         Args:
             df: Dataframe of retrieved financial data
@@ -215,7 +216,7 @@ class Processor(Fetcher):
             aum_returns: float,
             n_days_held: int
         ) -> float:
-        """Getter for annual AUM returns.
+        """Getter for annualized AUM returns.
 
         This is calculated using the following formula:
         (1 + aum return) ^ (250 days / number of days held) - 1
@@ -327,8 +328,7 @@ class Processor(Fetcher):
         aum_hist: pd.Series = stock_hist * n_stocks
         pct_change = aum_hist.pct_change().dropna()
         # There is no deviation if only 1 pct_change entry
-        return float(pct_change.std()) if \
-            len(pct_change) > 1 else 0
+        return float(pct_change.std())
 
     def _get_daily_sharpe_ratio(
         self,
@@ -355,8 +355,7 @@ class Processor(Fetcher):
             stock_hist, n_stocks
         )
         # sharpe ratio should be 0 if daily_sd is 0
-        return (avg_daily_return - self.DAILY_RISK_FREE) / daily_sd if \
-            daily_sd != 0 else 0
+        return (avg_daily_return - self.DAILY_RISK_FREE) / daily_sd
 
     def _plot_graph(
             self,
