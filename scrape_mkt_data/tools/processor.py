@@ -47,13 +47,13 @@ class Processor(Fetcher):
 
         # Retrieve the stock returns adjusted for dividends
         stock_hist = df["Stocks_Close_Adjusted"]
-
+        n_stocks_bought = float(self._initial_aum / stock_hist[0])
         # Rest of the statistics retrieved with atomic functions
         # So that each function can be easily edited
         adjusted_stock_returns = self._get_stock_returns(stock_hist)
         total_aum_returns = self._get_aum_returns(stock_hist)
         annual_aum_returns = self._get_annual_aum_returns(
-            adjusted_stock_returns, n_days
+            total_aum_returns, n_days
         )
         initial_aum = self._initial_aum
         final_aum = self._get_final_aum(total_aum_returns)
@@ -61,10 +61,9 @@ class Processor(Fetcher):
         max_aum = self._get_max_aum(stock_hist)
         pnl_aum = self._get_aum_pnl(initial_aum, final_aum)
         avg_daily_return_aum = self._get_average_daily_return(stock_hist)
-        print(df)
         avg_daily_aum_sd = self._get_daily_aum_sd()
         daily_sharpe_ratio = self._get_daily_aum_sharpe_ratio()
-
+        print(df)
         # Dictionary that is used for pretty-printing later
         statistics = {
             "Start Date:": start_date,
@@ -95,7 +94,7 @@ class Processor(Fetcher):
             to the data value.
         """
         # Line Separator to make print messages clearer
-        line_separator = "--------------------------------------------------------"
+        line_separator = "---------------------------------------------------"
         print(line_separator)
         print(f"Printing market data for the ticker {self._ticker}")
         print(line_separator)
@@ -103,7 +102,6 @@ class Processor(Fetcher):
         for info, value in statistics.items():
             print(info, value)
         print(line_separator)
-
 
     def _get_start_date_adjusted(self, df: pd.DataFrame) -> str:
         """Getter for start date (Adjusted for Public Holidays, etc).
@@ -161,16 +159,23 @@ class Processor(Fetcher):
         return df
 
     def _get_stock_returns(self, stock_hist: pd.Series) -> float:
+        """Getter for stock returns
+        """
         stock_initial = stock_hist[0]
         stock_final = stock_hist[-1]
         stock_returns = (stock_final - stock_initial) / stock_initial
         return stock_returns.astype(float)
 
     def _get_aum_returns(self, stock_hist: pd.Series) -> float:
-        stock_initial = stock_hist[0]
-        stock_final = stock_hist[-1]
-        stock_returns = (stock_final - stock_initial) / stock_initial
-        return stock_returns.astype(float)
+        """Getter for AUM returns.
+
+        Because we allow fractional shares in our calculation,
+        this function works in exactly the same way as
+        _get_stock_returns
+
+        Args:
+        """
+        return self._get_stock_returns(stock_hist)
 
     def _get_annual_aum_returns(
             self,
@@ -213,4 +218,7 @@ class Processor(Fetcher):
         pass
 
     def _get_daily_aum_sharpe_ratio(self) -> float:
+        pass
+
+    def _plot_graph(self) -> None:
         pass
