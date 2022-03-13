@@ -9,6 +9,9 @@ get_prices.py --ticker <xxx> –-b <YYYYMMDD> –-e <YYYYMMDD> --initial_aum <xx
 There are a few things to take note here:
 1. The ticker argument should be searchable in the total investable universe of equities on Yahoo finance
 2. The beginning and end date should not be the same and both dates cannot be later than the present date
+3. --initial_aum takes in a positive value with unit in USD
+4. --e is an optional parameter. If there is no input for --e, then the present date at the time of running the program will be selected
+5. --plot is an optional parameter. If --plot is used, the daily AUM will be plotted through the entire chosen time period.
 
 An example argument would be
 
@@ -32,5 +35,3 @@ We expect to display the following:
 12. Average daily return of the portfolio (i.e., of the AUM invested)
 13. Daily Standard deviation of the return of the portfolio
 14. Daily Sharpe Ratio of the portfolio (assume a daily risk-free rate of 0.01%)
-
-If --plot is used, the daily AUM will be plotted through the entire chosen time period.
