@@ -326,7 +326,9 @@ class Processor(Fetcher):
         """
         aum_hist: pd.Series = stock_hist * n_stocks
         pct_change = aum_hist.pct_change().dropna()
-        return float(pct_change.std())
+        # There is no deviation if only 1 pct_change entry
+        return float(pct_change.std()) if \
+            len(pct_change) > 1 else 0
 
     def _get_daily_sharpe_ratio(
         self,
@@ -345,13 +347,16 @@ class Processor(Fetcher):
         Returns:
             decimal representing the average sharpe ratio.
         """
+
         avg_daily_return = self._get_average_daily_return(
             stock_hist, n_stocks
         )
         daily_sd = self._get_daily_aum_sd(
             stock_hist, n_stocks
         )
-        return (avg_daily_return - self.DAILY_RISK_FREE) / daily_sd
+        # sharpe ratio should be 0 if daily_sd is 0
+        return (avg_daily_return - self.DAILY_RISK_FREE) / daily_sd if \
+            daily_sd != 0 else 0
 
     def _plot_graph(
             self,
@@ -371,9 +376,9 @@ class Processor(Fetcher):
         if self._is_plot:
             aum_hist = stock_hist * n_stocks
             aum_hist.plot(
-                title = f"Price history for ticker {self._ticker}",
+                title = "AUM history",
                 xlabel = "Date",
-                ylabel = "Price per Stock"
+                ylabel = "AUM in USD"
             )
             plt.savefig(f"./graph/{self._ticker}.png")
             plt.show()

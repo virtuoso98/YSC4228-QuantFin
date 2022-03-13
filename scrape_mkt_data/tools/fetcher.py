@@ -81,7 +81,7 @@ class Fetcher:
             if len(data) == 0:
                 raise Exception("No data available for given ticker.")
             if len(data) == 1:
-                raise Exception("Only 1 data point available, Check time period.")
+                raise Exception("Only 1 data point seen. Check time period.")
             return data
         # Error can be caused as raw date is converted to seconds (Line 150):
         # https://github.com/ranaroussi/yfinance/blob/main/yfinance/base.py
