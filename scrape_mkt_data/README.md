@@ -1,22 +1,22 @@
 # Assignment 2 - Scraping Market Data
 
-This repository code that is done by Walter and Zhao Yuan for the second assignment of Data Science in Quantitative Finance. In this task, we have decided to scrape market data using the yfinance package. In general,
+This repository code that is done by Walter and Zhao Yuan for the second assignment of Data Science in Quantitative Finance. In this task, we have decided to scrape market data using the yfinance package. This file was ran in python 3.10.2. In general,
 
-```
-get_prices.py --ticker <xxx> –-b <YYYYMMDD> –-e <YYYYMMDD> --initial_aum <xxxx>  --plot
+```python
+python get_prices.py --ticker <xxx> –-b <YYYYMMDD> –-e <YYYYMMDD> --initial_aum <xxxx>  --plot
 ```
 
 There are a few things to take note here:
 1. The ticker argument should be searchable in the total investable universe of equities on Yahoo finance
-2. The beginning and end date should not be the same and both dates cannot be later than the present date
+2. The start and end date should not be the same, start date should be earlier than end date, and both dates must be earlier than the present date
 3. --initial_aum takes in a positive value with unit in USD
 4. --e is an optional parameter. If there is no input for --e, then the present date at the time of running the program will be selected
 5. --plot is an optional parameter. If --plot is used, the daily AUM will be plotted through the entire chosen time period.
 
 An example argument would be
 
-```
-get_prices.py --ticker MSFT –-b 20200312 –-e 20210311 --initial_aum 10000  --plot
+```python
+python get_prices.py --ticker MSFT –-b 20200312 –-e 20210311 --initial_aum 10000  --plot
 ```
 
 We expect to display the following:
@@ -35,3 +35,5 @@ We expect to display the following:
 12. Average daily return of the portfolio (i.e., of the AUM invested)
 13. Daily Standard deviation of the return of the portfolio
 14. Daily Sharpe Ratio of the portfolio (assume a daily risk-free rate of 0.01%)
+
+To run the unit tests, run py.test on the main directory.
