@@ -1,9 +1,21 @@
-"""Authors: Zhao Yuan, Walter"""
+"""YSC4228 Data Science in Quantitative Finance
+
+Authors: Koa Zhao Yuan, Walter Boo Keng Hua
+
+This is the main file for the execution of the file to get prices.
+"""
 
 import argparse
 from tools.processor import Processor
 
-def process_inputs():
+def process_inputs() -> dict:
+    """Processes inputs from command line for further processing.
+
+    Returns:
+        Dictionary that maps parser command line arguments (key) to
+        the parameters (values) inputted by the user.
+    """
+    # Relevant Command Line Arguments
     parser = argparse.ArgumentParser(
         prog = "get_prices",
         description= "Get Stocks Price data using yfinance API"
@@ -35,9 +47,10 @@ def process_inputs():
     return vars(parser.parse_args())
 
 def execute():
+    """Overall function which runs the whole algorithm."""
     args = process_inputs()
     processor = Processor(args)
-    processor.compute_statistics()
+    statistics = processor.generate_statistics()
 
 if __name__ == '__main__':
     execute()

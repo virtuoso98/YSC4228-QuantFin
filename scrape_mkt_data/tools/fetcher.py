@@ -1,10 +1,21 @@
-"""Module to get financial data using yfinance"""
+"""Module containing the Fetcher Class to get financial
+ data of given ticker using the yfinance package."""
 
 from datetime import datetime, timedelta
 import yfinance as yf
 import pandas as pd
 
 class Fetcher:
+    """Class that fetches data about a given ticker
+
+    This class does a few things:
+    1.
+
+    Attributes:
+        ticker: String containing the inputted ticker name
+        start_date: Beginning day of retrieved financial data
+        end_date: Final day of retrieved financial data
+    """
     def __init__(self, args: dict) -> None:
         fetcher_args = self._check_fetcher_validity(args)
         self._ticker = fetcher_args["ticker"]
