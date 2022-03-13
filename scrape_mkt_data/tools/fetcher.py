@@ -37,10 +37,6 @@ class Fetcher:
         """
         # Check for possible ticker errors
         ticker = args["ticker"]
-        if len(ticker) != 4:
-            raise ValueError("Ticker should have 4 Characters")
-        if not ticker.isalpha():
-            raise ValueError("Ticker should only consist of letters")
 
         # Datetime automatically checks for datetime argument errors
         start_date = datetime.strptime(args["b"], "%Y%m%d")

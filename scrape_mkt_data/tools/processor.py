@@ -1,6 +1,7 @@
 """Sub-module storing the Processor Class that Does Data Crunching"""
 
 import pandas as pd
+import matplotlib.pyplot as plt
 from tools.fetcher import Fetcher
 
 class Processor(Fetcher):
@@ -27,6 +28,7 @@ class Processor(Fetcher):
         self._is_plot = args["plot"]
         # Assumption given in the question
         self.TRADING_DAYS_PER_YEAR = 250
+        self.DAILY_RISK_FREE = 0.0001
 
     def generate_statistics(self) -> None:
         """Overall Function that calculates the relevant statistics
@@ -43,32 +45,42 @@ class Processor(Fetcher):
         # Retrieve number of days + start, end dates
         start_date = self._get_start_date_adjusted(df)
         end_date = self._get_end_date_adjusted(df)
-        n_days = self._get_number_of_days(df)
+        trading_days = self._get_trading_days(df)
+        calender_days = pd.to_datetime(end_date) \
+            - pd.to_datetime(start_date)
 
+        n_calender_days = calender_days.days
         # Retrieve the stock returns adjusted for dividends
         stock_hist = df["Stocks_Close_Adjusted"]
         n_stocks_bought = float(self._initial_aum / stock_hist[0])
+
         # Rest of the statistics retrieved with atomic functions
         # So that each function can be easily edited
         adjusted_stock_returns = self._get_stock_returns(stock_hist)
-        total_aum_returns = self._get_aum_returns(stock_hist)
+        total_aum_returns = self._get_aum_returns(
+            stock_hist, n_stocks_bought
+        )
         annual_aum_returns = self._get_annual_aum_returns(
-            total_aum_returns, n_days
+            total_aum_returns, trading_days
         )
         initial_aum = self._initial_aum
         final_aum = self._get_final_aum(total_aum_returns)
-        average_aum = self._get_average_aum(stock_hist)
-        max_aum = self._get_max_aum(stock_hist)
+        average_aum = self._get_average_aum(stock_hist, n_stocks_bought)
+        max_aum = self._get_max_aum(stock_hist, n_stocks_bought)
         pnl_aum = self._get_aum_pnl(initial_aum, final_aum)
-        avg_daily_return_aum = self._get_average_daily_return(stock_hist)
-        avg_daily_aum_sd = self._get_daily_aum_sd()
-        daily_sharpe_ratio = self._get_daily_aum_sharpe_ratio()
-        print(df)
+        avg_daily_return_aum = \
+            self._get_average_daily_return(stock_hist, n_stocks_bought)
+        avg_daily_aum_sd = self._get_daily_aum_sd(
+            stock_hist, n_stocks_bought
+        )
+        daily_sharpe_ratio = self._get_daily_sharpe_ratio(
+            stock_hist, n_stocks_bought
+        )
         # Dictionary that is used for pretty-printing later
         statistics = {
-            "Start Date:": start_date,
-            "End Date: ": end_date,
-            "Number of Trading Days:": n_days,
+            "Start Date:": start_date.strftime("%Y-%m-%d"),
+            "End Date: ": end_date.strftime("%Y-%m-%d"),
+            "Calender Days:": n_calender_days,
             "Total stock return (With Dividends):": adjusted_stock_returns,
             "Total returns of AUM:": total_aum_returns,
             "Annualized AUM returns:": annual_aum_returns,
@@ -79,10 +91,11 @@ class Processor(Fetcher):
             "PnL of AUM:": pnl_aum,
             "Average daily returns:": avg_daily_return_aum,
             "Daily Standard Deviation:": avg_daily_aum_sd,
-            "Daily Sharpe Ratio": daily_sharpe_ratio
+            "Daily Sharpe Ratio:": daily_sharpe_ratio
         }
 
         self.print_statistics(statistics)
+        self._plot_graph(stock_hist, n_stocks_bought)
 
     def print_statistics(self, statistics: dict):
         """Function that handles the printing of statistics.
@@ -114,7 +127,7 @@ class Processor(Fetcher):
         """
         start_date_numpy = df.index.values[0]
         start_date_datetime = pd.to_datetime(str(start_date_numpy))
-        return start_date_datetime.strftime("%Y-%m-%d")
+        return start_date_datetime
 
     def _get_end_date_adjusted(self, df: pd.DataFrame) -> str:
         """Getter for end date (Adjusted for Public Holidays, etc).
@@ -127,9 +140,9 @@ class Processor(Fetcher):
         """
         end_date_numpy = df.index.values[-1]
         end_date_datetime = pd.to_datetime(str(end_date_numpy))
-        return end_date_datetime.strftime("%Y-%m-%d")
+        return end_date_datetime
 
-    def _get_number_of_days(self, df: pd.DataFrame) -> int:
+    def _get_trading_days(self, df: pd.DataFrame) -> int:
         """Getter for number of trading days in dataframe
 
         Args:
@@ -159,35 +172,68 @@ class Processor(Fetcher):
         return df
 
     def _get_stock_returns(self, stock_hist: pd.Series) -> float:
-        """Getter for stock returns
+        """Getter for stock returns at end of time period
+
+        Args:
+            stock_hist: time series of stock price history
+
+        Returns:
+            Stock returns in decimals
         """
         stock_initial = stock_hist[0]
         stock_final = stock_hist[-1]
         stock_returns = (stock_final - stock_initial) / stock_initial
         return stock_returns.astype(float)
 
-    def _get_aum_returns(self, stock_hist: pd.Series) -> float:
-        """Getter for AUM returns.
+    def _get_aum_returns(
+            self,
+            stock_hist: pd.Series,
+            n_stocks: float
+        ) -> float:
+        """Getter for AUM returns at end of time period
 
         Because we allow fractional shares in our calculation,
         this function works in exactly the same way as
-        _get_stock_returns
+        _get_stock_returns. However, the exact formula is given
+        for rigourousness. We assume that no transaction
+        cost is incurred in purchasing the point initially.
 
         Args:
+            stock_hist: time series of stock price history
+            n_stocks: number of stocks invested
+
+        Returns:
+            AUM Returns in decimal form
         """
-        return self._get_stock_returns(stock_hist)
+        aum_initial = stock_hist[0] * n_stocks
+        aum_final = stock_hist[-1] * n_stocks
+        aum_returns = (aum_final - aum_initial) / aum_initial
+        return aum_returns.astype(float)
 
     def _get_annual_aum_returns(
             self,
-            stock_returns: float,
+            aum_returns: float,
             n_days_held: int
         ) -> float:
-        annual_stock_returns = (1 + stock_returns) ** \
+        """Getter for annual AUM returns.
+
+        This is calculated using the following formula:
+        (1 + aum return) ^ (250 days / number of days held) - 1
+        and therefore is in decimal form
+
+        Args:
+            aum_returns: AUM return at end of period
+            n_days_held: number of trading days
+
+        Returns:
+            Annual AUM returns in decimal form
+        """
+        annual_stock_returns = (1 + aum_returns) ** \
             (self.TRADING_DAYS_PER_YEAR / n_days_held) - 1
         return self._initial_aum * annual_stock_returns
 
     def _get_final_aum(self, aum_returns: float) -> float:
-        """Getter for final AUM
+        """Gets the final AUM of the time period
 
         Args:
             aum_returns: float decimal representing AUM returns
@@ -198,27 +244,136 @@ class Processor(Fetcher):
         """
         return self._initial_aum * (1 + aum_returns)
 
-    def _get_average_aum(self, stock_hist: pd.Series) -> float:
-        # Normalize stock history relative to day 1
-        stock_hist_normalized: pd.Series = stock_hist / stock_hist[0]
-        return stock_hist_normalized.mean() * self._initial_aum
+    def _get_average_aum(self, stock_hist: pd.Series, n_stocks: float) -> float:
+        """Getter for Average AUM for time period
 
-    def _get_max_aum(self, stock_hist: pd.Series) -> float:
-        stock_hist_normalized: pd.Series = stock_hist / stock_hist[0]
-        return stock_hist_normalized.max() * self._initial_aum
+        Args:
+            stock_hist: Time Series of stock price history
+            n_stocks: Number of stocks invested
+
+        Returns:
+            float number representing average AUM over time period
+        """
+        # Normalize stock history relative to day 1
+        return stock_hist.mean() * n_stocks
+
+    def _get_max_aum(self, stock_hist: pd.Series, n_stocks: float) -> float:
+        """Getter for Maximum AUM for time period
+
+        Args:
+            stock_hist: Time Series of stock price history
+            n_stocks: Number of stocks invested
+
+        Returns:
+            float number representing maximum AUM for time period
+        """
+        return stock_hist.max() * n_stocks
 
     def _get_aum_pnl(self, initial_aum: float, final_aum: float) -> float:
+        """Getter for AUM PnL for time period
+
+        This is done by taking the final AUM minus the
+        initial AUM to obtain the required number.
+
+        Args:
+            stock_hist: Time Series of stock price history
+            n_stocks: Number of stocks invested
+
+        Returns:
+            Number representing AUM PnL in absolute numbers.
+            e.g. if initial AUM is 1000, and final AUM is 1100,
+            PnL is then 100.
+        """
         return final_aum - initial_aum
 
-    def _get_average_daily_return(self, stock_hist) -> float:
-        stock_hist_normalized: pd.Series = stock_hist / stock_hist[0]
-        return stock_hist_normalized.mean()
+    def _get_average_daily_return(
+            self,
+            stock_hist: pd.Series,
+            n_stocks: float
+        ) -> float:
+        """Getter for Average daily return for time period
 
-    def _get_daily_aum_sd(self) -> float:
-        pass
+        This is done by taking the daily percentage change
+        in decimal form and averaging it.
 
-    def _get_daily_aum_sharpe_ratio(self) -> float:
-        pass
+        Args:
+            stock_hist: Time Series of stock price history
+            n_stocks: Number of stocks invested
 
-    def _plot_graph(self) -> None:
-        pass
+        Returns:
+            decimal representing the average daily return.
+        """
+        aum_hist: pd.Series = stock_hist * n_stocks
+        pct_change = aum_hist.pct_change().dropna()
+        return float(pct_change.mean())
+
+    def _get_daily_aum_sd(
+        self,
+        stock_hist: pd.Series,
+        n_stocks: float
+    ) -> float:
+        """Getter for daily AUM sd
+
+        This is done by taking the daily percentage change
+        in decimal form and taking the standard deviation.
+
+        Args:
+            stock_hist: Time Series of stock price history
+            n_stocks: Number of stocks invested
+
+        Returns:
+            decimal representing the average daily return.
+        """
+        aum_hist: pd.Series = stock_hist * n_stocks
+        pct_change = aum_hist.pct_change().dropna()
+        return float(pct_change.std())
+
+    def _get_daily_sharpe_ratio(
+        self,
+        stock_hist: pd.Series,
+        n_stocks: float
+    ) -> float:
+        """Getter for daily sharpe ratio for time period
+
+        This is done by taking the daily percentage change
+        in decimal form and averaging it.
+
+        Args:
+            stock_hist: Time Series of stock price history
+            n_stocks: Number of stocks invested
+
+        Returns:
+            decimal representing the average sharpe ratio.
+        """
+        avg_daily_return = self._get_average_daily_return(
+            stock_hist, n_stocks
+        )
+        daily_sd = self._get_daily_aum_sd(
+            stock_hist, n_stocks
+        )
+        return (avg_daily_return - self.DAILY_RISK_FREE) / daily_sd
+
+    def _plot_graph(
+            self,
+            stock_hist: pd.Series,
+            n_stocks: float
+        ) -> None:
+        """Generates time series graph of the stock, if
+        _is_plot is set to True.
+
+        Args:
+            stock_hist: Time Series of stock price history
+            n_stocks: Number of stocks invested
+
+        Returns:
+            Saved version of graph in ./graph directory
+        """
+        if self._is_plot:
+            aum_hist = stock_hist * n_stocks
+            aum_hist.plot(
+                title = f"Price history for ticker {self._ticker}",
+                xlabel = "Date",
+                ylabel = "Price per Stock"
+            )
+            plt.savefig(f"./graph/{self._ticker}.png")
+            plt.show()

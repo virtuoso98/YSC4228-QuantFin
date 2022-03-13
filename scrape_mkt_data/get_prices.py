@@ -21,6 +21,7 @@ def process_inputs() -> dict:
         description= "Get Stocks Price data using yfinance API"
     )
     parser.add_argument("--ticker",
+        type = str,
         required = True,
         help = "Ticker for Scraper to track"
     )
@@ -50,7 +51,7 @@ def execute():
     """Overall function which runs the whole algorithm."""
     args = process_inputs()
     processor = Processor(args)
-    statistics = processor.generate_statistics()
+    processor.generate_statistics()
 
 if __name__ == '__main__':
     execute()
