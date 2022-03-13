@@ -32,4 +32,3 @@ def test_bad_plot_arg():
         ]
         sys.argv = argv_head + new_args
         execute()
-
