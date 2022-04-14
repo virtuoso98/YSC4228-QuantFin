@@ -1,6 +1,6 @@
 # Assignment 2 - Scraping Market Data
 
-This repository code that is done by Walter and Zhao Yuan for the second assignment of Data Science in Quantitative Finance. In this task, we have decided to scrape market data using the yfinance package. This file was ran in python 3.10.2. In general,
+This repository code is done by Walter and Zhao Yuan for the second assignment of Data Science in Quantitative Finance. In this task, we have decided to scrape market data using the yfinance package. This file was ran in python 3.10.2. In general,
 
 ```python
 python get_prices.py --ticker <xxx> –-b <YYYYMMDD> –-e <YYYYMMDD> --initial_aum <xxxx>  --plot
