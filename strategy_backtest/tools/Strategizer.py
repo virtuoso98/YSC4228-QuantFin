@@ -1,7 +1,5 @@
 from tools.Fetcher import Fetcher
 
-class Processor(Fetcher):
-    """Parses Data"""
-
+class Strategizer(Fetcher):
     def __init__(self, args: dict) -> None:
-        pass
+        super().__init__(args)
