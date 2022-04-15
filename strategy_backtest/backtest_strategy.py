@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import argparse
 
-from tools.Fetcher import Fetcher
+from tools.Executor import Executor
 
 def process_inputs() -> dict:
     '''Processes inputs from command line for further processing'''
@@ -86,7 +86,8 @@ def check_validity(args: dict) -> dict:
 def execute():
     '''Overall function that executes backtest strategy.'''
     args = process_inputs()
-    fetcher = Fetcher(args)
+    executor = Executor(args)
+    executor.strategize()
 
 if __name__ == '__main__':
     execute()
