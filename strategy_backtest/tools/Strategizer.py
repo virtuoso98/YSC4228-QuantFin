@@ -17,7 +17,6 @@ class Strategizer(Fetcher):
     of relevant statistics.
 
     Attributes:
-        init_aum: initial AUM, stored to be retrieved later on.
         curr_aum: current assets under management, based on month
         n_top_tickers: number of top tickers to allocate AUM to
         cul_info_coef: Culminative information coefficient
@@ -25,7 +24,6 @@ class Strategizer(Fetcher):
     """
     def __init__(self, args: dict) -> None:
         super().__init__(args)
-        self.init_aum = args["initial_aum"]
         self.curr_aum = args["initial_aum"]
         self.n_top_tickers = self.find_n_top_tickers(args)
         self.cul_info_coef: pd.Series = None
@@ -52,6 +50,7 @@ class Strategizer(Fetcher):
 
         # Specifying which strategy to use
         strat = 'Reversal' if self.strat == 'R' else 'Momentum'
+        print(self.LINE_SEPARATOR)
         print(f"Executing {strat} strategy")
         for i in range(self.n_months):
             top_tickers_hist.append(self.find_top_tickers(i))
@@ -60,7 +59,7 @@ class Strategizer(Fetcher):
                 self.track_aum(top_tickers_hist, daily_aum, monthly_ic)
         print("Infomation coefficient and daily AUM change recorded.")
         print("Tidying up IC and AUM Data.")
-
+        print(self.LINE_SEPARATOR)
         # Cuminative information coefficient, so we take cumsum
         self.cul_info_coef = pd.Series(monthly_ic).cumsum()
         self.daily_aum_hist = \

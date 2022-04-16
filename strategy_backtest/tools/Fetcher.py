@@ -21,9 +21,11 @@ class Fetcher:
         end_date: final day to take position
         days: number of days used to compute strategy-related returns
         data: Raw financial information about ticker
+        LINE_SEPARATOR: Constant in line separating for presentability
     """
     def __init__(self, args: dict) -> None:
         self.n_months = None
+        self.LINE_SEPARATOR = "*" * 50
         self.begin_date = args["b"]
         self.end_date = args["e"]
         self.strat = args["strategy_type"]
@@ -66,6 +68,7 @@ class Fetcher:
             timedelta(days = self.determine_period(self.days))
         end_retrieve = self.end_date
         # Initialize data for each ticker
+        print(self.LINE_SEPARATOR)
         for ticker in tickers:
             print(f"Retrieving yfinance data for {ticker}")
             ticker_df = self.fetch_data(ticker, start_retrieve, end_retrieve)
@@ -74,6 +77,7 @@ class Fetcher:
             data[ticker]["df"] = processed_df
             data[ticker]["last_days"] = last_trading_days
         print("Raw data for all necessary tickers fetched")
+        print(self.LINE_SEPARATOR)
         return data
 
     def fetch_data(self, ticker: str,
