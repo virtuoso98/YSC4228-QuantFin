@@ -1,17 +1,29 @@
+"""YSC4228 Data Science in Quantitative Finance
+
+Authors: Koa Zhao Yuan, Walter Boo Keng Hua
+
+This is the main file for the execution of the backtesting strategy.
+"""
+
 from datetime import datetime, timedelta
 import argparse
 
-from tools.Executor import Executor
+from tools.Portfolio import Portfolio
 
 def process_inputs() -> dict:
-    '''Processes inputs from command line for further processing'''
+    """Processes inputs from command line for further processing
+
+    Returns:
+        Dictionary that maps parser command line arguments (key) to
+        the parameters (values) inputted by the user.
+    """
     parser = argparse.ArgumentParser(
-        prog = 'backtest_strategy',
-        description = 'Test simple Momentum and Reversal monthly strategies'
+        prog = "backtest_strategy",
+        description = "Test simple Momentum and Reversal monthly strategies"
     )
     parser.add_argument(
-        '--tickers', '--list', nargs = '+',
-        help = '<REQUIRED> List of Tickers to track',
+        "--tickers", "--list", nargs = "+",
+        help = "<REQUIRED> List of Tickers to track",
         required = True
     )
     parser.add_argument("--b",
@@ -49,7 +61,14 @@ def process_inputs() -> dict:
 
 
 def check_validity(args: dict) -> dict:
-    """Check for validity of arguments"""
+    """Check for validity of arguments based on given restrictions
+
+    Args:
+        args: input arguments as provided in the command line
+
+    Returns:
+        a slightly more data-clean version of args to be used later.
+    """
     if args["days"] > 250:
         raise ValueError("--days: Trading Days Exceed 250.")
     if args["days"] < 1:
@@ -84,10 +103,10 @@ def check_validity(args: dict) -> dict:
 
 
 def execute():
-    '''Overall function that executes backtest strategy.'''
+    """Overall function that executes backtest strategy."""
     args = process_inputs()
-    executor = Executor(args)
-    executor.strategize()
+    portfolio = Portfolio(args)
+    portfolio.strategize()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     execute()
