@@ -67,11 +67,13 @@ class Fetcher:
         end_retrieve = self.end_date
         # Initialize data for each ticker
         for ticker in tickers:
+            print(f"Retrieving yfinance data for {ticker}")
             ticker_df = self.fetch_data(ticker, start_retrieve, end_retrieve)
             processed_df = self.process_df(ticker_df)
             last_trading_days = self.find_last_days(ticker, ticker_df)
             data[ticker]["df"] = processed_df
             data[ticker]["last_days"] = last_trading_days
+        print("Raw data for all necessary tickers fetched")
         return data
 
     def fetch_data(self, ticker: str,

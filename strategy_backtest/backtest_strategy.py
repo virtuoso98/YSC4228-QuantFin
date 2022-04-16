@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import argparse
 
 from tools.Portfolio import Portfolio
+from tools.Strategizer import Strategizer
 
 def process_inputs() -> dict:
     """Processes inputs from command line for further processing
@@ -105,8 +106,13 @@ def check_validity(args: dict) -> dict:
 def execute():
     """Overall function that executes backtest strategy."""
     args = process_inputs()
-    portfolio = Portfolio(args)
-    portfolio.strategize()
+    strategizer = Strategizer(args)
+    strategizer.strategize()
+
+    portfolio = Portfolio(
+        strategizer.cul_info_coef,
+        strategizer.daily_aum_hist
+    )
 
 if __name__ == "__main__":
     execute()
