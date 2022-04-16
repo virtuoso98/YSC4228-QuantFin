@@ -17,17 +17,20 @@ class Strategizer(Fetcher):
     of relevant statistics.
 
     Attributes:
-        curr_aum: current assets under management, based on month measured
+        init_aum: initial AUM, stored to be retrieved later on.
+        curr_aum: current assets under management, based on month
         n_top_tickers: number of top tickers to allocate AUM to
         cul_info_coef: Culminative information coefficient
         daily_aum_hist: Daily AUM history of stocks
     """
     def __init__(self, args: dict) -> None:
         super().__init__(args)
+        self.init_aum = args["initial_aum"]
         self.curr_aum = args["initial_aum"]
         self.n_top_tickers = self.find_n_top_tickers(args)
-        self.cul_info_coef: pd.Series= None
+        self.cul_info_coef: pd.Series = None
         self.daily_aum_hist: pd.Series = None
+
 
     def find_n_top_tickers(self, args: dict) -> int:
         """Find number of top tickers to invest on, based on strategy
@@ -102,15 +105,15 @@ class Strategizer(Fetcher):
         return sorted_returns[:self.n_top_tickers]
 
     def track_aum(self,
-        top_tickers_hist: "list[list]",
-        daily_aum: pd.Series,
+        top_tickers_hist: "list[list[dict]]",
+        daily_aum: "list[pd.Series]",
         monthly_ic: dict) -> None:
-        """
+        """Tracks the AUM change (and IC) of the selected top tickers
 
         Args:
-            top_tickers_hist:
-            daily_aum:
-            monthly_ic:
+            top_tickers_hist: History of top tickers chosen
+            daily_aum: Daily AUM, as a list of pandas series
+            monthly_ic: Monthly IC, as a dictionary
         """
         # Assume all tickers have have last trading day of month
         end: pd.Timestamp = top_tickers_hist[-1][0]["end"]
@@ -141,14 +144,13 @@ class Strategizer(Fetcher):
         monthly_ic: dict) -> None:
         """Calculates Information coefficient for the given month
 
+        However, IC is passed unto the parameter monthly_ic by reference,
+        so this function is a void function (returns None)
+
         Args:
-            aum_by_ticker:
-            day:
-            monthly_ic:
-
-        Returns:
-            
-
+            aum_by_ticker: AUM of the ticker in the given month
+            day: The last day of the month that maps to the IC
+            monthly_ic: dictionary, with date as keys, IC as values
         """
         n_increase = 0
         for ticker_df in aum_by_ticker:

@@ -7,9 +7,7 @@ This is the main file for the execution of the backtesting strategy.
 
 from datetime import datetime, timedelta
 import argparse
-
 from tools.Portfolio import Portfolio
-from tools.Strategizer import Strategizer
 
 def process_inputs() -> dict:
     """Processes inputs from command line for further processing
@@ -79,9 +77,10 @@ def check_validity(args: dict) -> dict:
     if args["strategy_type"] not in ["R", "M"]:
         raise ValueError("--strategy_type: Only 'R'(Reversal) or 'M'(Momentum)")
     if args["initial_aum"] <= 0:
-        raise ValueError("Initial AUM must be positive")
+        raise ValueError("--initial_aum: Initial AUM must be positive")
     # Check for DateTime validity
     start_date_DT = datetime.strptime(args["b"], "%Y%m%d")
+
     end_date_DT = datetime.strptime(args["e"], "%Y%m%d") \
         if args["e"] is not None else datetime.now()
 
@@ -106,13 +105,11 @@ def check_validity(args: dict) -> dict:
 def execute():
     """Overall function that executes backtest strategy."""
     args = process_inputs()
-    strategizer = Strategizer(args)
-    strategizer.strategize()
-
-    portfolio = Portfolio(
-        strategizer.cul_info_coef,
-        strategizer.daily_aum_hist
-    )
+    portfolio = Portfolio(args)
+    # Strategize first then print stats
+    portfolio.strategize()
+    portfolio.print_stats()
+    portfolio.plot_graph()
 
 if __name__ == "__main__":
     execute()
