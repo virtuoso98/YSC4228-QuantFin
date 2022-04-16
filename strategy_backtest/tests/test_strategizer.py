@@ -85,4 +85,50 @@ def test_top_n_tickers_sanity():
         # Decided to use it directly because I'm not completely
         # sure of @staticmethod. Not good practice though.
         n_top_tickers = ceil(args["top_pct"] / 100 * len(args["tickers"]))
-        assert(1 <= n_top_tickers <= len(random_tickers))
+        assert 1 <= n_top_tickers <= len(random_tickers)
+
+def test_beginning_end_date_same_month():
+    input_args = {
+        "tickers": ["AAPL", "TSLA", "GOOG", "NVDA"],
+        "b": "20220103",
+        "e": "20220130",
+        "initial_aum": 10 ** 7,
+        "strategy_type": 'M',
+        "days": 65,
+        "top_pct": 40
+    }
+    with pytest.raises(ValueError) as excinfo:
+        check_validity(input_args)
+        # pylint: disable=line-too-long
+        assert "Position taken at last trading day of start date month. Please select end date at least 1 month after start date" \
+            in excinfo.value
+
+def test_beginning_later_than_end_date():
+    input_args = {
+        "tickers": ["AAPL", "TSLA", "GOOG", "NVDA"],
+        "b": "20190203",
+        "e": "20180130",
+        "initial_aum": 10 ** 7,
+        "strategy_type": 'M',
+        "days": 65,
+        "top_pct": 40
+    }
+    with pytest.raises(ValueError) as excinfo:
+        check_validity(input_args)
+        assert "Start Date is later than End Date" \
+            in excinfo.value
+
+def test_beginning_later_than_end_date_2():
+    input_args = {
+        "tickers": ["AAPL", "TSLA", "GOOG", "NVDA"],
+        "b": "20400203",
+        "e": None,
+        "initial_aum": 10 ** 7,
+        "strategy_type": 'M',
+        "days": 65,
+        "top_pct": 40
+    }
+    with pytest.raises(ValueError) as excinfo:
+        check_validity(input_args)
+        assert "Start date cannot be after current time" \
+            in excinfo.value

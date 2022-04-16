@@ -94,13 +94,19 @@ def check_validity(args: dict) -> dict:
 
     # Start date cannot be later than end date
     if start_date_DT > end_date_DT:
-        raise ValueError("Start Date is later than Start Date")
+        raise ValueError("Start Date is later than End Date")
+
+    # Start date cannot be at same month and year as end
+    # this is because positions are taken at the end of month
+    if start_date_DT.year == end_date_DT.year and \
+        start_date_DT.month == end_date_DT.month:
+        # pylint: disable=line-too-long
+        raise ValueError("Position taken at last trading day of start date month. Please select end date at least 1 month after start date")
 
     # Update Args so that it is easier to initialize class
     args["b"] = start_date_DT
     args["e"] = end_date_DT
     return args
-
 
 def execute():
     """Overall function that executes backtest strategy."""

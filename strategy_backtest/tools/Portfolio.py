@@ -1,16 +1,20 @@
 """This module contains the class Portfolio, that is supposed to
 Consolidate the portfolio data we have and present some statistics.
 Since many of the methods used here are atomic, I have shaved the
-documnetation to occupy minimal space and minimize clutter
+documnetation to occupy minimal space and minimize clutter.
 """
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
 from tools.Strategizer import Strategizer
 
 class Portfolio(Strategizer):
     """Class that computes the relevant statistics of the portfolio.
+
+    In detail, this class computes relevant information about the portfolio
+    which is shown below and also plots the graph of the culminative IC
+    and returns on the same axis.
 
     Attributes:
         YEAR_TO_TRADING_DAYS: constant set at 250.
@@ -20,9 +24,14 @@ class Portfolio(Strategizer):
         self.YEAR_TO_TRADING_DAYS = 250
 
     def print_stats(self) -> None:
+        """Overall function that prints relevant statistics relating to AUM
+
+        In essence, this function computes all relevant statistics to the AUM
+        then prints all the information as elaborated below
+        """
         start = self.get_start_date()
         end = self.get_end_date()
-        # Not sure about total stock returns, but i'm assuming
+        # Not sure about total stock returns, but I'm assuming
         # it's the same as AUM returns
         total_stock_return = self.get_aum_return()
         total_aum_return = self.get_aum_return()
@@ -118,6 +127,40 @@ class Portfolio(Strategizer):
         return (avg_daily_aum_return - risk_free) / daily_aum_sd
 
     def plot_graph(self):
-        cul_info_coef = self.cul_info_coef.copy()
-        daily_aum_hist = self.daily_aum_hist.copy()
+        """Graphs both culminative IC and AUM on same pyplot.
 
+        This function takes both IC, AUM pandas series and
+        plots them. However, some care is taken to re-scale the
+        axis to make both graphs prominent and also implementing
+        appropriate legends.
+        """
+        plt.style.use("fivethirtyeight")
+        fig, ax = plt.subplots(figsize = (16, 10))
+        # plot daily aum hist first
+        ax.plot(self.daily_aum_hist, color = "red")
+        ax.set_xlabel("Date by Year and Month", fontsize = 14)
+        ax.set_ylabel("AUM over time", color = "red", fontsize = 14)
+
+        # then plot culminative information coefficient
+        ax2 = ax.twinx()
+        ax2.plot(self.cul_info_coef, color = "blue")
+        ax2.set_ylabel("Culminative information coefficient",
+            color = "blue", fontsize = 14)
+
+        # make x labels slightly smaller to minimize overlap
+        for tick in ax.xaxis.get_major_ticks():
+            tick.label.set_fontsize(10)
+
+        # make legend via brute force
+        reds_line = mlines.Line2D([], [],
+            color = 'red', label = 'AUM over time')
+        blue_line = mlines.Line2D([], [],
+            color = 'blue', label='Culminative Information Coefficient')
+        plt.legend(handles = [blue_line, reds_line])
+
+        # Once done, save the figure
+        fig.savefig(
+            "./graphs/plot_aum_and_ic.jpg",
+            format = "jpeg",
+        )
+        plt.show()

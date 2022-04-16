@@ -15,3 +15,9 @@ The parameters are explained below:
 - **--strategy_type** : Strategy to execute. Input **R** for reversal and **M** for momentum.
 - **--days** : Number of days to compute strategy-related returns. For the momentum strategy, an additional 20 trading-day gap is added to avoid the typical reversal effect.
 - **--top_pct** : Top (1 to 100) percentile of the tickers under the strategy type to be selected for rebalancing. Note that the number of tickers selected is rounded up. If 10 tickers are being tracked and _55_ is the _top_pct_ parameter value, then the top 6 tickers will be selected.
+
+We have assumed the following while implementing this portfolio allocator:
+
+1. When rebalancing portfolio, no transaction cost is incurred
+2. AUM is evenly rebalanced to the tickers that we allocate to
+3. Fractional stocks can be bought.
