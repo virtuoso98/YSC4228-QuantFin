@@ -1,23 +1,11 @@
-"""YSC4228 Data Science in Quantitative Finance
-
-Authors: Koa Zhao Yuan, Walter Boo Keng Hua
-
-This is the main file for the execution of the backtesting strategy.
-"""
-
+from tools.Fetcher import Fetcher
 from datetime import datetime, timedelta
 import argparse
 
 def process_inputs() -> dict:
-    """Processes inputs from command line for further processing
-
-    Returns:
-        Dictionary that maps parser command line arguments (key) to
-        the parameters (values) inputted by the user.
-    """
     parser = argparse.ArgumentParser(
-        prog = "backtest_strategy",
-        description = "Test simple Momentum and Reversal monthly strategies"
+        prog = "backtest_two_signal_strategy",
+        description = "Test Strategy of linear combination of 2 signals"
     )
     parser.add_argument(
         "--tickers", "--list", nargs = "+",
@@ -26,23 +14,31 @@ def process_inputs() -> dict:
     )
     parser.add_argument("--b",
         required = True, type = str,
-        help = "<REQUIRED> Start Date to track (YYYYMMDD)"
+        help = "Start Date to track (YYYYMMDD)"
     )
     parser.add_argument("--e",
         required = False, type = str,
-        help = "<OPTIONAL> Stop Date to Track (YYYYMMDD). Default: today's date"
+        help = "Stop Date to Track (YYYYMMDD). Default: today's date"
     )
     parser.add_argument("--initial_aum",
         required = True, type = int,
         help = "Initial Assets Under Management, expressed in US dollars"
     )
-    parser.add_argument("--strategy_type",
+    parser.add_argument("--strategy1_type",
         required = True, type = str,
-        help = "Investing Strategy to use. Input 'R' for Reversal and 'M' for Momentum."
+        help = "First Strategy: Input 'R' for Reversal and 'M' for Momentum."
     )
-    parser.add_argument("--days",
+    parser.add_argument("--days1",
         required = True, type = int,
-        help = "Number of trading days used to compute strategy-related returns"
+        help = "Number of trading days used to compute First Strategy returns"
+    )
+    parser.add_argument("--strategy2_type",
+        required = True, type = str,
+        help = "Second Strategy: Input 'R' for Reversal and 'M' for Momentum."
+    )
+    parser.add_argument("--days2",
+        required = True, type = int,
+        help = "Number of trading days used to compute Second Strategy returns"
     )
     parser.add_argument("--top_pct",
         required = True, type = int,
@@ -59,16 +55,24 @@ def process_inputs() -> dict:
 
 
 def check_validity(args: dict) -> dict:
-    if args["days"] > 250:
-        raise ValueError("--days: Trading Days Exceed 250.")
-    if args["days"] < 1:
-        raise ValueError("--days: Trading days Param must be positive.")
-    if args["top_pct"] < 1 or args["top_pct"] > 100:
-        raise ValueError("--top_pct: Percentile must be between 1 and 100.")
-    if args["strategy_type"] not in ["R", "M"]:
-        raise ValueError("--strategy_type: Only 'R'(Reversal) or 'M'(Momentum)")
+    # Check for Simpler arguments first before more complex ones
     if args["initial_aum"] <= 0:
         raise ValueError("--initial_aum: Initial AUM must be positive")
+    if args["top_pct"] < 1 or args["top_pct"] > 100:
+        raise ValueError("--top_pct: Percentile must be between 1 and 100.")
+
+    # for-loop to make days checking more compact
+    for days in ["days1", "days2"]:
+        if args[days] > 250:
+            raise ValueError(f"--{days}: Trading Days Exceed 250.")
+        if args[days] < 1:
+            raise ValueError(f"--{days}: Trading days Param must be positive.")
+
+    # for-loop to make strategy checking more compact
+    for strat in ["strategy1_type", "strategy2_type"]:
+        if args[strat] not in ["R", "M"]:
+            raise ValueError(f"--{strat}: Only 'R'(Reversal) or 'M'(Momentum)")
+
     # Check for DateTime validity
     start_date_DT = datetime.strptime(args["b"], "%Y%m%d")
 
@@ -102,6 +106,7 @@ def check_validity(args: dict) -> dict:
 def execute():
     """Overall function that executes backtest strategy."""
     args = process_inputs()
+    fetcher = Fetcher(args)
 
 if __name__ == "__main__":
     execute()
