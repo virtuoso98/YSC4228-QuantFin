@@ -7,7 +7,6 @@ This is the main file for the execution of the backtesting strategy.
 
 from datetime import datetime, timedelta
 import argparse
-from tools.Portfolio import Portfolio
 
 def process_inputs() -> dict:
     """Processes inputs from command line for further processing
@@ -60,14 +59,6 @@ def process_inputs() -> dict:
 
 
 def check_validity(args: dict) -> dict:
-    """Check for validity of arguments based on given restrictions
-
-    Args:
-        args: input arguments as provided in the command line
-
-    Returns:
-        a slightly more data-clean version of args to be used later.
-    """
     if args["days"] > 250:
         raise ValueError("--days: Trading Days Exceed 250.")
     if args["days"] < 1:
@@ -111,11 +102,6 @@ def check_validity(args: dict) -> dict:
 def execute():
     """Overall function that executes backtest strategy."""
     args = process_inputs()
-    portfolio = Portfolio(args)
-    # Strategize first then print stats
-    portfolio.strategize()
-    portfolio.print_stats()
-    portfolio.plot_graph()
 
 if __name__ == "__main__":
     execute()

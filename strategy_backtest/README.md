@@ -1,6 +1,6 @@
-# Assignment 3 - Testing Backtesting Strategies
+# Assignment 3 - Backtesting Single Strategy
 
-This repository is done by Walter and Zhao Yuan for the second assignment for Data Science in Quantitative Finance. In this assignment, we are required to backtest reversal and momentum based strategies. Afterwards, we are to print the information coefficient and how our assets under management fared. To run this repository, you may run this command to start.
+This repository is done by Walter and Zhao Yuan for the third assignment for Data Science in Quantitative Finance. In this assignment, we are required to backtest reversal and momentum based strategies. Afterwards, we are to print the information coefficient and how our assets under management fared. To run this repository, you may run this command to start.
 
 ```python
 python backtest_strategy.py --tickers MSFT APPL NVDA --b 20200414 --e 20200718 --initial_aum 5000 --strategy_type R --days 10 --top_pct 50
