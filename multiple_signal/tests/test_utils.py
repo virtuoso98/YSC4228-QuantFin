@@ -48,4 +48,3 @@ def generate_random_ticker_dummy() -> "list[str]":
         )
         tickers.append(dummy_ticker)
     return tickers
-

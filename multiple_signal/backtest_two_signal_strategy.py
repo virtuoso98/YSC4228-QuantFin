@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 import argparse
-from tools.Strategizer import Strategizer
+from tools.portfolio import Portfolio
 
 def process_inputs() -> dict:
     parser = argparse.ArgumentParser(
@@ -8,7 +8,7 @@ def process_inputs() -> dict:
         description = "Test Strategy of linear combination of 2 signals"
     )
     parser.add_argument(
-        "--tickers", "--list", nargs = "+",
+        "--tickers", type = str,
         help = "<REQUIRED> List of Tickers to track",
         required = True
     )
@@ -101,12 +101,19 @@ def check_validity(args: dict) -> dict:
     # Update Args so that it is easier to initialize class
     args["b"] = start_date_DT
     args["e"] = end_date_DT
+
+    # Change ticker format to list of strings for easier processing
+    args["tickers"] = [s.strip() for s in args["tickers"].split(",")]
     return args
 
 def execute():
     """Overall function that executes backtest strategy."""
     args = process_inputs()
-    strategizer = Strategizer(args)
+    portfolio = Portfolio(args)
+    # Strategize first then print stats
+    portfolio.strategize()
+    portfolio.print_stats()
+    portfolio.plot_graph()
 
 if __name__ == "__main__":
     execute()

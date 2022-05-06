@@ -16,7 +16,7 @@ def test_bad_string_aum():
             bad_aum = generate_random_str_alpha()
             argv_head = [sys.argv[0]]
             new_args = [
-                "tickers", "MSFT AAPL NVDA GOOG",
+                "tickers", "MSFT,AAPL,NVDA,GOOG",
                 "b", "20210315",
                 "e", "20211023",
                 "initial_aum", bad_aum,
@@ -36,7 +36,7 @@ def test_bad_top_pct():
             bad_top_pct = generate_random_str_alpha()
             argv_head = [sys.argv[0]]
             new_args = [
-                "tickers", "MSFT AAPL NVDA GOOG",
+                "tickers", "MSFT,AAPL,NVDA,GOOG",
                 "b", "20210315",
                 "e", "20211023",
                 "initial_aum", "10000",
@@ -57,7 +57,7 @@ def test_bad_days1():
             bad_n_days1 = generate_random_str_alpha()
             argv_head = [sys.argv[0]]
             new_args = [
-                "tickers", "MSFT AAPL NVDA GOOG",
+                "tickers", "MSFT,AAPL,NVDA,GOOG",
                 "b", "20210315",
                 "e", "20211023",
                 "initial_aum", "10000",
@@ -77,7 +77,7 @@ def test_bad_days2():
             bad_n_days2 = generate_random_str_alpha()
             argv_head = [sys.argv[0]]
             new_args = [
-                "tickers", "MSFT AAPL NVDA GOOG",
+                "tickers", "MSFT,AAPL,NVDA,GOOG",
                 "b", "20210315",
                 "e", "20211023",
                 "initial_aum", "10000",
