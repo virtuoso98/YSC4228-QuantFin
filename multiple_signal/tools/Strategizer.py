@@ -1,5 +1,6 @@
 from math import ceil
 from functools import reduce
+from sklearn.linear_model import LinearRegression
 import pandas as pd
 from tools.Fetcher import Fetcher
 
@@ -10,6 +11,7 @@ class Strategizer(Fetcher):
         self.n_top_tickers = self.find_n_top_tickers(args)
         self.cul_info_coef: pd.Series = None
         self.daily_aum_hist: pd.Series = None
+        self.model_stats = None
 
     def find_n_top_tickers(self, args: dict) -> int:
         return ceil(args["top_pct"] / 100 * len(args["tickers"]))

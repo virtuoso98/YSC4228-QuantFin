@@ -1,6 +1,6 @@
-from tools.Fetcher import Fetcher
 from datetime import datetime, timedelta
 import argparse
+from tools.Strategizer import Strategizer
 
 def process_inputs() -> dict:
     parser = argparse.ArgumentParser(
@@ -106,7 +106,7 @@ def check_validity(args: dict) -> dict:
 def execute():
     """Overall function that executes backtest strategy."""
     args = process_inputs()
-    fetcher = Fetcher(args)
+    strategizer = Strategizer(args)
 
 if __name__ == "__main__":
     execute()
