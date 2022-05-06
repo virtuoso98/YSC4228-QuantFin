@@ -150,7 +150,7 @@ class Fetcher:
         ].index
         dates_list = dates_idx.to_list()
 
-        # We now collect signals from previous month, so this line is very important
+        # We now start collect signals from previous month
         data_begin_date = datetime(
             year = self.begin_date.year if self.begin_date.month != 1 else \
                 self.begin_date.year - 1,

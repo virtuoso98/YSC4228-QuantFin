@@ -42,7 +42,9 @@ class Portfolio(Strategizer):
         daily_sd_aum = self.get_sd_daily_aum()
 
         # compress message into 1 unified string
-        reg_info_str = reduce(lambda a, b: f"\n{a}\n\n{b}", self.model_stats).strip()
+        reg_info_str = reduce(
+            lambda a, b: f"\n{a}\n\n{b}",
+            self.model_stats).strip()
 
         statistics = [
             ("1. Begin Date:", start),
@@ -59,7 +61,8 @@ class Portfolio(Strategizer):
             ("12. Average daily AUM return:", avg_daily_aum_return),
             ("13. Daily S.D of portfolio returns:", daily_sd_aum),
             ("14. Daily Sharpe Ratio of portfolio:", \
-                self.get_daily_sharpe_ratio(daily_sd_aum, avg_daily_aum_return)),
+                self.get_daily_sharpe_ratio(daily_sd_aum,
+                    avg_daily_aum_return)),
             ("15. Regression Model Statistics:", f"\n\n{reg_info_str}")
         ]
         print(self.LINE_SEPARATOR)

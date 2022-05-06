@@ -1,8 +1,21 @@
+"""YSC4228 Data Science in Quantitative Finance
+
+Authors: Koa Zhao Yuan, Walter Boo Keng Hua
+
+This is the main file for the execution of the backtesting strategy.
+"""
+
 from datetime import datetime, timedelta
 import argparse
 from tools.portfolio import Portfolio
 
 def process_inputs() -> dict:
+    """Processes inputs from command line for further processing
+
+    Returns:
+        Dictionary that maps parser command line arguments (key) to
+        the parameters (values) inputted by the user.
+    """
     parser = argparse.ArgumentParser(
         prog = "backtest_two_signal_strategy",
         description = "Test Strategy of linear combination of 2 signals"
@@ -55,6 +68,14 @@ def process_inputs() -> dict:
 
 
 def check_validity(args: dict) -> dict:
+    """Check for validity of arguments based on given restrictions
+
+    Args:
+        args: input arguments as provided in the command line
+
+    Returns:
+        a slightly more data-clean version of args to be used later.
+    """
     # Check for Simpler arguments first before more complex ones
     if args["initial_aum"] <= 0:
         raise ValueError("--initial_aum: Initial AUM must be positive")

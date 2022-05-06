@@ -59,8 +59,8 @@ class Strategizer(Fetcher):
         top_tickers_hist = []
 
         # Specifying print message for clarity
-        strat1 = 'Reversal' if self.strat1 == 'R' else 'Momentum'
-        strat2 = 'Reversal' if self.strat2 == 'R' else 'Momentum'
+        strat1 = "Reversal" if self.strat1 == "R" else "Momentum"
+        strat2 = "Reversal" if self.strat2 == "R" else "Momentum"
         print(self.LINE_SEPARATOR)
         print("Executing Multiple Signal Strategy Consisting of:")
         print(f"Strategy 1: {strat1}, Period: {self.days1} days")
@@ -78,14 +78,21 @@ class Strategizer(Fetcher):
         print("Tidying up IC and AUM Data.")
         print(self.LINE_SEPARATOR)
         self.cul_info_coef = pd.Series(monthly_ic).cumsum()
+        self.daily_aum_hist = pd.concat(daily_aum)
         self.daily_aum_hist = \
             pd.concat(daily_aum).drop_duplicates(keep = "first")
 
     def get_monthly_model_stats(self, date: datetime) -> None:
-        # Solution taken from stackoverflow:
+        """Gets coefficients and t-statistic for linear regression model
+
+        Args:
+            date: last day of the month in question
+        """
+        # Solution taken from stackoverflow to calculate t-statistic:
         # https://stackoverflow.com/questions/27928275/find-p-value-significance-in-scikit-learn-linearregression
         # Standard Square Errors
-        sse = np.sum((self.sk_ols.predict(self.x_train) - self.y_train) ** 2, axis = 0) \
+        sse = np.sum(
+            (self.sk_ols.predict(self.x_train) - self.y_train) ** 2, axis = 0)\
             / float(self.x_train.shape[0] - self.x_train.shape[1])
         # Calculate standard errors
         se = np.array([
@@ -100,6 +107,7 @@ class Strategizer(Fetcher):
         strat1 = "Reversal" if self.strat1 == "R" else "Momentum"
         strat2 = "Reversal" if self.strat2 == "R" else "Momentum"
 
+        # Generate in a list for easy reduction
         monthly_model_stats_list = [
             f"Date Generated: {date}",
             f"x1 ({strat1} Strat) Coefficient: {params[0]}",
@@ -108,6 +116,7 @@ class Strategizer(Fetcher):
             f"x2 ({strat2} Strat) t-value: {tstats[1]}",
         ]
 
+        # reduce to form a nicely packed string of data
         monthly_model_stats_str = reduce(
             lambda a, b: f"{a}\n{b}", monthly_model_stats_list
         )
@@ -115,10 +124,14 @@ class Strategizer(Fetcher):
 
 
     def fit_model(self, mth_idx: int) -> None:
-        """Find signal
+        """Fits linear regression model of the 2 signals with monthly returns
 
-        This can be further improved if we generalized multiple
-        parameters by a data structure such as a dictionary
+        More specifically, for a given month, this function fits
+        the 2 strategy based coefficients using the signal-returns taken
+        from the previous month and the monthly return of the current month.
+
+        Args:
+            mth_idx: index in the last dates of month array
         """
         for _, data in self.data.items():
             # retrieve relevant data
@@ -162,6 +175,7 @@ class Strategizer(Fetcher):
             y_data = np.array([month_returns])
             self.x_train = np.vstack((self.x_train, x_data))
             self.y_train = np.vstack((self.y_train, y_data))
+
         # After data points for all tickers obtained, fit model
         self.sk_ols.fit(self.x_train, self.y_train)
         self.get_monthly_model_stats(curr_month)
@@ -184,14 +198,18 @@ class Strategizer(Fetcher):
             # Get signal based returns for strategy1
             strat1_start_idx = end_idx - self.days1
             strat1_start_window = data["df"].index[strat1_start_idx]
-            strat1_start_price = data["df"].at[strat1_start_window, "Close_Adjusted"]
-            strat1_returns = (end_price - strat1_start_price) / strat1_start_price
+            strat1_start_price = data["df"].at[strat1_start_window, \
+                "Close_Adjusted"]
+            strat1_returns = (end_price - strat1_start_price) \
+                / strat1_start_price
 
-            # Get signal based returns for strategy1
+            # Get signal based returns for strategy2
             strat2_start_idx = end_idx - self.days2
             strat2_start_window = data["df"].index[strat2_start_idx]
-            strat2_start_price = data["df"].at[strat2_start_window, "Close_Adjusted"]
-            strat2_returns = (end_price - strat2_start_price) / strat2_start_price
+            strat2_start_price = data["df"].at[strat2_start_window, \
+                "Close_Adjusted"]
+            strat2_returns = (end_price - strat2_start_price) \
+                / strat2_start_price
 
             # Extract model score
             model_score = self.sk_ols.predict(
