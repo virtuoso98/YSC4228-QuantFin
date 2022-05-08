@@ -167,11 +167,9 @@ class Strategizer(Fetcher):
                 / prev_month_last_px
 
             # Add data to array to prepare for linear regression
-            # Multiply -1 if reversal strategy to favour lower signal returns
-            x_data = np.array([
-                -strat1_returns if self.strat1 == "R" else strat1_returns,
-                -strat2_returns if self.strat2 == "R" else strat2_returns
-            ])
+            # No need multiply because linear regression model adjusts
+            # automatically to the dataset.
+            x_data = np.array([strat1_returns, strat2_returns])
             y_data = np.array([month_returns])
             self.x_train = np.vstack((self.x_train, x_data))
             self.y_train = np.vstack((self.y_train, y_data))
