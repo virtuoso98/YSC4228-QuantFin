@@ -13,4 +13,4 @@ tools/__pycache__/*
 
 # Virtual Environment
 .venv
-.venv/*3
+.venv/*
